@@ -1,6 +1,11 @@
 package filestore
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"path"
+
 	"github.com/lluiscampos/bit4beat.back/model"
 	"github.com/lluiscampos/bit4beat.back/store"
 )
@@ -9,15 +14,60 @@ type FileStore struct {
 	rootDir string
 }
 
-func NewStore() store.Store {
-	return &FileStore{rootDir: "/dummy/path"}
+func NewStore(rootDir string) store.Store {
+	return &FileStore{
+		rootDir: rootDir,
+	}
 }
 
-func (fs *FileStore) GetRecords() ([]model.Record, int, error) {
-	return nil, 0, nil
+const (
+	fileMode          = 0644
+	recordFilenameFmt = "record_%d.json"
+)
+
+func (fs *FileStore) CreateRecord(record *model.Record) error {
+	jsonBytes, err := json.Marshal(record)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(fs.filepath(record.ID), jsonBytes, fileMode)
 }
 
-func (fs *FileStore) GetRecord(id int) (*model.Record, error) {
-	r := &model.Record{ID: id}
-	return r, nil
+func (fs *FileStore) readRecordFromFile(filepath string) (*model.Record, error) {
+	r := &model.Record{ID: -1}
+
+	fileBytes, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(fileBytes, r)
+	return r, err
+}
+
+func (fs *FileStore) ReadRecord(id int) (*model.Record, error) {
+	return fs.readRecordFromFile(fs.filepath(id))
+}
+
+func (fs *FileStore) ListRecords() ([]model.Record, error) {
+	files, err := ioutil.ReadDir(fs.rootDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var records []model.Record
+	for _, file := range files {
+		r, err := fs.readRecordFromFile(path.Join(fs.rootDir, file.Name()))
+		if err != nil {
+			return nil, err
+		}
+
+		records = append(records, *r)
+	}
+	return records, nil
+}
+
+func (fs *FileStore) filepath(id int) string {
+	filename := fmt.Sprintf(recordFilenameFmt, id)
+	return path.Join(fs.rootDir, filename)
 }

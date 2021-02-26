@@ -13,7 +13,7 @@ func main() {
 
 func doMain(args []string) {
 	fmt.Println("getting record")
-	store := filestore.NewStore()
+	store := filestore.NewStore("/dummy/dir")
 	r, err := store.GetRecord(42)
 	if err != nil {
 		fmt.Println("error")

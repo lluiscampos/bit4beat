@@ -5,6 +5,7 @@ import (
 )
 
 type Store interface {
-	GetRecords() ([]model.Record, int, error)
-	GetRecord(id int) (*model.Record, error)
+	CreateRecord(*model.Record) error
+	ReadRecord(id int) (*model.Record, error)
+	ListRecords() ([]model.Record, error)
 }
