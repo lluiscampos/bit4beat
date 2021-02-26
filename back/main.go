@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/lluiscampos/bit4beat.back/api"
 	"github.com/lluiscampos/bit4beat.back/store/filestore"
 )
 
@@ -13,10 +14,8 @@ func main() {
 
 func doMain(args []string) {
 	fmt.Println("getting record")
-	store := filestore.NewStore("/dummy/dir")
-	r, err := store.GetRecord(42)
-	if err != nil {
-		fmt.Println("error")
-	}
-	fmt.Println(r.ID)
+	store := filestore.NewStore("/tmp/dummy-dir")
+
+	api := api.NewApi(store)
+	api.Serve()
 }
