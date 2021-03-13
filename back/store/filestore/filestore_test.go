@@ -20,13 +20,21 @@ func TestCreateRecord(t *testing.T) {
 	store := NewStore(tmpdir)
 	assert.NotNil(t, store)
 
-	myRecord := &model.Record{ID: 42}
+	myRecord := &model.Record{ID: "42"}
 	err = store.CreateRecord(myRecord)
 	assert.NoError(t, err)
 
 	content, err := ioutil.ReadFile(path.Join(tmpdir, "record_42.json"))
 	assert.NoError(t, err)
-	assert.Equal(t, `{"id":42}`, string(content))
+	assert.Contains(t, string(content), `{"id":"42"`)
+
+	myOtherRecord := &model.Record{ID: "unique-id-foo-bar"}
+	err = store.CreateRecord(myOtherRecord)
+	assert.NoError(t, err)
+
+	content, err = ioutil.ReadFile(path.Join(tmpdir, "record_unique-id-foo-bar.json"))
+	assert.NoError(t, err)
+	assert.Contains(t, string(content), `{"id":"unique-id-foo-bar"`)
 }
 
 func TestReadRecord(t *testing.T) {
@@ -37,12 +45,12 @@ func TestReadRecord(t *testing.T) {
 	store := NewStore(tmpdir)
 	assert.NotNil(t, store)
 
-	err = ioutil.WriteFile(path.Join(tmpdir, "record_42.json"), []byte(`{"id":42}`), 0644)
+	err = ioutil.WriteFile(path.Join(tmpdir, "record_42.json"), []byte(`{"id":"42"}`), 0644)
 	require.NoError(t, err)
 
-	myRecord, err := store.ReadRecord(42)
+	myRecord, err := store.ReadRecord("42")
 	assert.NoError(t, err)
-	assert.Equal(t, 42, myRecord.ID)
+	assert.Equal(t, "42", myRecord.ID)
 }
 
 func TestListRecords(t *testing.T) {
@@ -53,10 +61,10 @@ func TestListRecords(t *testing.T) {
 	store := NewStore(tmpdir)
 	assert.NotNil(t, store)
 
-	err = ioutil.WriteFile(path.Join(tmpdir, "record_42.json"), []byte(`{"id":42}`), 0644)
+	err = ioutil.WriteFile(path.Join(tmpdir, "record_42.json"), []byte(`{"id":"42"}`), 0644)
 	require.NoError(t, err)
 
-	err = ioutil.WriteFile(path.Join(tmpdir, "record_bad.json"), []byte(`{"id":47}`), 0644)
+	err = ioutil.WriteFile(path.Join(tmpdir, "record_bad.json"), []byte(`{"id":"47"}`), 0644)
 	require.NoError(t, err)
 
 	myRecords, err := store.ListRecords()

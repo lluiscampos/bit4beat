@@ -6,6 +6,6 @@ import (
 
 type Store interface {
 	CreateRecord(*model.Record) error
-	ReadRecord(id int) (*model.Record, error)
+	ReadRecord(id string) (*model.Record, error)
 	ListRecords() ([]model.Record, error)
 }

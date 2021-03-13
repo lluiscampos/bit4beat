@@ -22,7 +22,7 @@ func NewStore(rootDir string) store.Store {
 
 const (
 	fileMode          = 0644
-	recordFilenameFmt = "record_%d.json"
+	recordFilenameFmt = "record_%s.json"
 )
 
 func (fs *FileStore) CreateRecord(record *model.Record) error {
@@ -35,17 +35,17 @@ func (fs *FileStore) CreateRecord(record *model.Record) error {
 }
 
 func (fs *FileStore) readRecordFromFile(filepath string) (*model.Record, error) {
-	r := &model.Record{ID: -1}
+	var r model.Record
 
 	fileBytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(fileBytes, r)
-	return r, err
+	err = json.Unmarshal(fileBytes, &r)
+	return &r, err
 }
 
-func (fs *FileStore) ReadRecord(id int) (*model.Record, error) {
+func (fs *FileStore) ReadRecord(id string) (*model.Record, error) {
 	return fs.readRecordFromFile(fs.filepath(id))
 }
 
@@ -67,7 +67,7 @@ func (fs *FileStore) ListRecords() ([]model.Record, error) {
 	return records, nil
 }
 
-func (fs *FileStore) filepath(id int) string {
+func (fs *FileStore) filepath(id string) string {
 	filename := fmt.Sprintf(recordFilenameFmt, id)
 	return path.Join(fs.rootDir, filename)
 }

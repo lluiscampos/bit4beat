@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"io/ioutil"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -43,12 +42,7 @@ func (api *Api) Serve() {
 	})
 
 	router.GET("/record/:id", func(context *gin.Context) {
-		idStr := context.Param("id")
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			context.JSON(500, gin.H{"error": string(err.Error())})
-		}
-
+		id := context.Param("id")
 		record, err := api.store.ReadRecord(id)
 		if err != nil {
 			context.JSON(500, gin.H{"error": string(err.Error())})
