@@ -31,6 +31,7 @@ func (fs *FileStore) CreateRecord(record *model.Record) error {
 		return err
 	}
 
+	// TODO: check if file exists!
 	return ioutil.WriteFile(fs.filepath(record.ID), jsonBytes, fileMode)
 }
 

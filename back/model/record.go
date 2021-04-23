@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	distanceReg = regexp.MustCompile(`^[-0-9]+ (km|m)$`)
+	distanceReg = regexp.MustCompile(`^[-0-9]+(:?.5)? (km|m)$`)
 )
 
 type Record struct {
@@ -28,7 +28,7 @@ type Record struct {
 	// Accepts .5 precision, suffixed with unit
 	Distance string `json:"distance,omitempty"`
 
-	Participants []string `json:"participants,omitempty`
+	Participants []string `json:"participants,omitempty"`
 
 	Reference string `json:"reference,omitempty"`
 }

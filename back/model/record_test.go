@@ -60,6 +60,7 @@ func TestValidateDistance(t *testing.T) {
 		"1 m",
 		"-1 km",
 		"987834726483217468127341827987 km",
+		"5.5 m",
 	}
 	for _, d := range validDistances {
 		rValidDistance := newRecordMinValid()

@@ -24,18 +24,28 @@ func (api *Api) createRecordHandler(context *gin.Context) {
 	jsonData, err := ioutil.ReadAll(context.Request.Body)
 	if err != nil {
 		context.JSON(500, gin.H{"error": string(err.Error())})
+		return
 	}
 
 	var record model.Record
 	err = json.Unmarshal(jsonData, &record)
 	if err != nil {
 		context.JSON(500, gin.H{"error": string(err.Error())})
+		return
+	}
+
+	err = record.Validate()
+	if err != nil {
+		context.JSON(400, gin.H{"error": string(err.Error())})
+		return
 	}
 
 	err = api.store.CreateRecord(&record)
 	if err != nil {
 		context.JSON(500, gin.H{"error": string(err.Error())})
 	}
+
+	context.JSON(200, record)
 }
 
 func (api *Api) showRecordHandler(context *gin.Context) {
